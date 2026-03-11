@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinTrack - Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00c795",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#0E1117",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .heatmap-cell {
+            aspect-ratio: 1 / 1;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex min-h-screen">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-full bg-background-light dark:bg-background-dark z-50">
+<div class="p-6 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-background-dark font-bold">query_stats</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight">FinTrack</h1>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-sm font-medium">Accounts</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined">swap_horiz</span>
+<span class="text-sm font-medium">Transactions</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-medium">Reports</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</div>
+</nav>
+<div class="p-4 mt-auto">
+<div class="p-4 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden">
+<img alt="User" data-alt="User profile photo showing a smiling professional man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYj0mYmYc07wnGfynPKW3A8q_N-XVsMt4qhknbvt38sZ-gL7bhfWc_S9pjHcDSvhdxArzjEPhte0Vw-I3nUNp75xorPlBrJ_CRdCqO-Ty2jP0QYn6LjH-S2KLZ3x4tMNghHPEDwqheJATz9WmeNyEVdv2PhIvChKgMk5UjzzEZXnVXFmbPKetwfcnWnuor0fc5tjnGGT3sRSUotqNgW6Q-E3CiDCP4lj7Vmxt8_pbKh-SJhwu-fsbyFNFxwzoWK0tV7Aa6jr6x-qc"/>
+</div>
+<div>
+<p class="text-xs font-semibold">Alex Rivera</p>
+<p class="text-[10px] text-slate-500">Premium Plan</p>
+</div>
+</div>
+<button class="w-full text-xs font-bold py-2 px-4 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-primary/20 transition-colors">Upgrade</button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen overflow-y-auto">
+<!-- Top Bar -->
+<header class="h-20 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-40">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+<button class="px-4 py-1.5 text-xs font-medium rounded-md bg-white dark:bg-slate-700 shadow-sm">Year</button>
+<button class="px-4 py-1.5 text-xs font-medium rounded-md text-slate-500">Month</button>
+</div>
+<div class="flex items-center gap-3 border-l border-slate-200 dark:border-slate-800 pl-6">
+<span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Period:</span>
+<div class="flex items-center gap-1 cursor-pointer">
+<span class="text-sm font-semibold">2024</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+<div class="flex items-center gap-1 cursor-pointer">
+<span class="text-sm font-semibold">Oct</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-background-dark font-bold text-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Export Data
+                    </button>
+<div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 cursor-pointer hover:text-slate-900 dark:hover:text-slate-100">
+<span class="material-symbols-outlined">notifications</span>
+</div>
+</div>
+</header>
+<!-- Dashboard Body -->
+<div class="p-8 space-y-8">
+<!-- KPI Row -->
+<div class="grid grid-cols-4 gap-6">
+<div class="p-6 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-widest mb-1">Total Balance</p>
+<div class="flex items-end justify-between">
+<h3 class="text-2xl font-bold">$124,530.00</h3>
+<span class="text-primary text-xs font-bold flex items-center gap-0.5">+4.2% <span class="material-symbols-outlined text-sm">trending_up</span></span>
+</div>
+</div>
+<div class="p-6 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-widest mb-1">Avg Monthly Income</p>
+<div class="flex items-end justify-between">
+<h3 class="text-2xl font-bold">$12,400.00</h3>
+<span class="text-primary text-xs font-bold flex items-center gap-0.5">+1.8% <span class="material-symbols-outlined text-sm">trending_up</span></span>
+</div>
+</div>
+<div class="p-6 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-widest mb-1">Avg Expenses</p>
+<div class="flex items-end justify-between">
+<h3 class="text-2xl font-bold">$8,120.00</h3>
+<span class="text-rose-500 text-xs font-bold flex items-center gap-0.5">+0.5% <span class="material-symbols-outlined text-sm">trending_up</span></span>
+</div>
+</div>
+<div class="p-6 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-widest mb-1">Savings Rate</p>
+<div class="flex items-end justify-between">
+<h3 class="text-2xl font-bold">34.5%</h3>
+<span class="text-primary text-xs font-bold flex items-center gap-0.5">+2.4% <span class="material-symbols-outlined text-sm">trending_up</span></span>
+</div>
+</div>
+</div>
+<!-- Row 1: Historical Balance & Category Debits -->
+<div class="grid grid-cols-3 gap-6">
+<div class="col-span-2 p-6 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between mb-8">
+<h4 class="font-bold">Historical Balance Analysis</h4>
+<div class="flex items-center gap-4 text-xs font-medium text-slate-500">
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary"></span> Actual</div>
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full border border-primary border-dashed"></span> Projection</div>
+</div>
+</div>
+<div class="h-64 relative">
+<!-- Visual Chart Mockup -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 800 200">
+<defs>
+<lineargradient id="fillGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#00c795" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#00c795" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,180 Q100,160 200,170 T400,130 T600,110 T800,90" fill="transparent" stroke="#00c795" stroke-width="3"></path>
+<path d="M0,180 Q100,160 200,170 T400,130 T600,110 T800,90 L800,200 L0,200 Z" fill="url(#fillGrad)"></path>
+<path d="M800,90 Q900,80 1000,70" fill="transparent" stroke="#00c795" stroke-dasharray="8,4" stroke-width="2"></path>
+</svg>
+<div class="absolute bottom-0 left-0 right-0 flex justify-between px-2 text-[10px] text-slate-500 uppercase tracking-tighter mt-4">
+<span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+</div>
+</div>
+</div>
+<div class="p-6 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+<h4 class="font-bold mb-6">Category Debits/Credits</h4>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span>Housing</span>
+<span class="text-slate-400">$3,200.00</span>
+</div>
+<div class="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 85%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span>Food &amp; Drinks</span>
+<span class="text-slate-400">$1,150.00</span>
+</div>
+<div class="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 45%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span>Transportation</span>
+<span class="text-slate-400">$840.00</span>
+</div>
+<div class="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 32%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span>Entertainment</span>
+<span class="text-slate-400">$1,420.00</span>
+</div>
+<div class="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 55%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span>Health</span>
+<span class="text-slate-400">$450.00</span>
+</div>
+<div class="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 15%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 2: Avg vs Closing & Yearly Avg Credits -->
+<div class="grid grid-cols-2 gap-6">
+<div class="p-6 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between mb-8">
+<h4 class="font-bold">Avg vs Closing Balance</h4>
+<select class="text-xs bg-slate-100 dark:bg-slate-800 border-none rounded-lg focus:ring-0">
+<option>Last 6 Months</option>
+</select>
+</div>
+<div class="flex items-end gap-2 h-48 pt-4">
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex items-end gap-0.5 h-full">
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 h-[60%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary h-[85%] rounded-t-sm"></div>
+</div>
+<span class="text-[10px] text-slate-500 uppercase font-bold">May</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex items-end gap-0.5 h-full">
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 h-[65%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary h-[70%] rounded-t-sm"></div>
+</div>
+<span class="text-[10px] text-slate-500 uppercase font-bold">Jun</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex items-end gap-0.5 h-full">
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 h-[50%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary h-[90%] rounded-t-sm"></div>
+</div>
+<span class="text-[10px] text-slate-500 uppercase font-bold">Jul</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex items-end gap-0.5 h-full">
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 h-[70%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary h-[80%] rounded-t-sm"></div>
+</div>
+<span class="text-[10px] text-slate-500 uppercase font-bold">Aug</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex items-end gap-0.5 h-full">
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 h-[75%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary h-[85%] rounded-t-sm"></div>
+</div>
+<span class="text-[10px] text-slate-500 uppercase font-bold">Sep</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full flex items-end gap-0.5 h-full">
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 h-[80%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary h-[95%] rounded-t-sm"></div>
+</div>
+<span class="text-[10px] text-slate-500 uppercase font-bold">Oct</span>
+</div>
+</div>
+</div>
+<div class="p-6 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+<h4 class="font-bold mb-8">Yearly Average Credits</h4>
+<div class="space-y-4">
+<div class="grid grid-cols-12 gap-1 items-end h-40">
+<div class="bg-primary/40 h-[40%] rounded-t-sm"></div>
+<div class="bg-primary/40 h-[55%] rounded-t-sm"></div>
+<div class="bg-primary/40 h-[50%] rounded-t-sm"></div>
+<div class="bg-primary/40 h-[70%] rounded-t-sm"></div>
+<div class="bg-primary/40 h-[65%] rounded-t-sm"></div>
+<div class="bg-primary/40 h-[85%] rounded-t-sm"></div>
+<div class="bg-primary/40 h-[75%] rounded-t-sm"></div>
+<div class="bg-primary h-[95%] rounded-t-sm"></div>
+<div class="bg-primary/40 h-[60%] rounded-t-sm"></div>
+<div class="bg-primary/40 h-[80%] rounded-t-sm"></div>
+<div class="bg-primary/40 h-[45%] rounded-t-sm"></div>
+<div class="bg-primary/40 h-[70%] rounded-t-sm"></div>
+</div>
+<div class="flex justify-between items-center text-xs font-medium">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5">
+<span class="text-slate-500">Peak:</span>
+<span class="text-primary font-bold">$14.2k</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="text-slate-500">Avg:</span>
+<span class="font-bold">$10.8k</span>
+</div>
+</div>
+<span class="text-slate-400">Values in USD</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Row: Daily Activity Heatmap -->
+<div class="p-6 rounded-xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h4 class="font-bold">Daily Activity vs Categories Heatmap</h4>
+<p class="text-xs text-slate-500 mt-1">Darker green indicates higher frequency/amount. Red border indicates anomalous spending.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-primary/20"></span> <span class="text-[10px] uppercase font-bold text-slate-500">Low</span></div>
+<div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-primary/60"></span> <span class="text-[10px] uppercase font-bold text-slate-500">Med</span></div>
+<div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-primary"></span> <span class="text-[10px] uppercase font-bold text-slate-500">High</span></div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<div class="min-w-[800px]">
+<div class="grid grid-cols-[100px_1fr] gap-4 items-center mb-2">
+<div class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Category</div>
+<div class="flex justify-between px-1 text-[10px] font-bold text-slate-500 uppercase">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+<div class="space-y-2">
+<div class="grid grid-cols-[100px_1fr] gap-4 items-center">
+<div class="text-[11px] font-semibold">Housing</div>
+<div class="grid grid-cols-28 gap-1 h-5">
+<!-- Mock heatmap blocks -->
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary rounded-sm border-2 border-rose-500"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/30 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/40 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/30 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/60 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/40 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/50 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/30 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+</div>
+</div>
+<div class="grid grid-cols-[100px_1fr] gap-4 items-center">
+<div class="text-[11px] font-semibold">Food &amp; Drink</div>
+<div class="grid grid-cols-28 gap-1 h-5">
+<div class="bg-primary rounded-sm"></div>
+<div class="bg-primary/80 rounded-sm"></div>
+<div class="bg-primary/90 rounded-sm"></div>
+<div class="bg-primary/70 rounded-sm"></div>
+<div class="bg-primary rounded-sm"></div>
+<div class="bg-primary rounded-sm"></div>
+<div class="bg-primary/90 rounded-sm"></div>
+<div class="bg-primary/80 rounded-sm"></div>
+<div class="bg-primary/60 rounded-sm"></div>
+<div class="bg-primary rounded-sm"></div>
+<div class="bg-primary/70 rounded-sm"></div>
+<div class="bg-primary/80 rounded-sm"></div>
+<div class="bg-primary rounded-sm border-2 border-rose-500"></div>
+<div class="bg-primary/90 rounded-sm"></div>
+<div class="bg-primary/60 rounded-sm"></div>
+<div class="bg-primary/50 rounded-sm"></div>
+<div class="bg-primary rounded-sm"></div>
+<div class="bg-primary/90 rounded-sm"></div>
+<div class="bg-primary/70 rounded-sm"></div>
+<div class="bg-primary/80 rounded-sm"></div>
+<div class="bg-primary rounded-sm"></div>
+<div class="bg-primary/90 rounded-sm"></div>
+<div class="bg-primary/60 rounded-sm"></div>
+<div class="bg-primary/50 rounded-sm"></div>
+<div class="bg-primary rounded-sm"></div>
+<div class="bg-primary/90 rounded-sm"></div>
+<div class="bg-primary/70 rounded-sm"></div>
+<div class="bg-primary/80 rounded-sm"></div>
+</div>
+</div>
+<div class="grid grid-cols-[100px_1fr] gap-4 items-center">
+<div class="text-[11px] font-semibold">Transport</div>
+<div class="grid grid-cols-28 gap-1 h-5">
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/50 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/30 rounded-sm"></div>
+<div class="bg-primary/40 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/50 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/30 rounded-sm"></div>
+<div class="bg-primary/40 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+</div>
+</div>
+<div class="grid grid-cols-[100px_1fr] gap-4 items-center">
+<div class="text-[11px] font-semibold">Health</div>
+<div class="grid grid-cols-28 gap-1 h-5">
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/40 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/40 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/40 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/40 rounded-sm"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer class="mt-auto p-8 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 flex justify-between">
+<span>© 2024 FinTrack Financial Systems Inc.</span>
+<div class="flex gap-4">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+</div>
+</footer>
+</main>
+</div>
+<style>
+        /* Custom Grid for the 28 days mockup in heatmap */
+        .grid-cols-28 {
+            grid-template-columns: repeat(28, minmax(0, 1fr));
+        }
+    </style>
+</body></html>

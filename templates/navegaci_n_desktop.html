@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00c795",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#0f231e",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<title>Financial Dashboard Sidebar</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="flex h-full w-64 flex-col border-r border-primary/10 bg-background-light dark:bg-background-dark transition-all duration-300">
+<div class="flex flex-col h-full p-4">
+<!-- User Profile Section -->
+<div class="mb-8 flex items-center gap-3 px-2 py-3 rounded-xl bg-primary/5 border border-primary/10">
+<div class="relative flex-shrink-0">
+<div class="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
+<img alt="User profile avatar" class="h-full w-full object-cover" data-alt="Close up portrait of a smiling man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsVZxwBhgsRfv1JRD90iZQdoQ5oluVlIBx2_0JyJujKjhIpGJjz_YMTLwbgeFmIpzld71QsGVzm6VUbQHI81RZUnN7vK9Voqv8u0NWIhpRcXRiJabjFZEG1G7oMThqqYL60acryGy20JiTnNo5c5LV5lFKzB3lC42nKWGFezTLgfZLIQXoyz5LXKxYc4j4PXakt-Ck_JmJmBpsekFdzdf43IvlHJFVl_jtxEgK1W0hGV3guIHMaCbP6ATossJzMHJz13fd-ov2ku4"/>
+</div>
+<div class="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background-dark bg-primary"></div>
+</div>
+<div class="flex flex-col overflow-hidden">
+<h1 class="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">Juan Pérez</h1>
+<p class="truncate text-xs text-primary font-medium uppercase tracking-wider">Premium Plan</p>
+</div>
+</div>
+<!-- Navigation Menu -->
+<nav class="flex flex-1 flex-col gap-2">
+<div class="space-y-1">
+<a class="group flex items-center gap-3 rounded-lg bg-primary px-3 py-2.5 text-white transition-all" href="#">
+<span class="material-symbols-outlined text-[22px] transition-transform group-hover:scale-110">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-[22px] transition-transform group-hover:scale-110">swap_horiz</span>
+<span class="text-sm font-medium">Movimientos</span>
+</a>
+<a class="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-[22px] transition-transform group-hover:scale-110">label</span>
+<span class="text-sm font-medium">Categorías</span>
+</a>
+</div>
+<!-- Divider -->
+<div class="my-4 h-px w-full bg-primary/10"></div>
+</nav>
+<!-- Footer Section -->
+<div class="mt-auto flex flex-col gap-4">
+<!-- Last Processed PDF Indicator -->
+<div class="flex items-center gap-3 rounded-lg bg-primary/5 border border-primary/10 p-3">
+<div class="flex h-8 w-8 items-center justify-center rounded-md bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-lg">description</span>
+</div>
+<div class="flex flex-col">
+<p class="text-[10px] font-bold uppercase tracking-tight text-slate-500 dark:text-slate-500">Last Processed</p>
+<p class="text-xs font-medium text-slate-700 dark:text-slate-300">2023-10-27</p>
+</div>
+</div>
+<!-- System Settings (Extra) -->
+<button class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area (Placeholder) -->
+<main class="flex-1 overflow-auto p-8">
+<header class="mb-8">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">Dashboard Overview</h2>
+<p class="text-slate-500 dark:text-slate-400">Welcome back to your financial summary.</p>
+</header>
+<!-- Placeholder Cards -->
+<div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+<div class="rounded-xl border border-primary/10 bg-white/50 dark:bg-slate-900/50 p-6 shadow-sm">
+<div class="mb-4 h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<p class="text-sm font-medium text-slate-500">Total Balance</p>
+<h3 class="text-2xl font-bold">$12,450.00</h3>
+</div>
+<div class="rounded-xl border border-primary/10 bg-white/50 dark:bg-slate-900/50 p-6 shadow-sm">
+<div class="mb-4 h-12 w-12 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<p class="text-sm font-medium text-slate-500">Monthly Savings</p>
+<h3 class="text-2xl font-bold text-emerald-500">+$2,340.00</h3>
+</div>
+<div class="rounded-xl border border-primary/10 bg-white/50 dark:bg-slate-900/50 p-6 shadow-sm">
+<div class="mb-4 h-12 w-12 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500">
+<span class="material-symbols-outlined">receipt_long</span>
+</div>
+<p class="text-sm font-medium text-slate-500">Pending Bills</p>
+<h3 class="text-2xl font-bold text-rose-500">3</h3>
+</div>
+</div>
+<!-- Pattern Background Element -->
+<div class="mt-12 relative h-64 w-full rounded-2xl overflow-hidden border border-primary/10">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+<img alt="Financial graph background" class="h-full w-full object-cover opacity-20 mix-blend-overlay" data-alt="Abstract financial line chart with green accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyhSXwiCZVAgGr-97tR-lf1pX9X2-yMXY4QKjeJ0YCN7lENBnmAq-fGgUb65-CSJzkSqweCTCjVe7ItSzFgPBPqQpZ09f0IocAs-9MN-zi7mHjxt8K8GNj710bTJY7kFfoU2daxxsLaoT04N6_540ifWIqbVjxrJ7FFHLe5iowVa7ziigcLwCdPOA_4wuTtUqionJWnr5oBGD33dSAY9s7rP4uPVfqYNKy4fltY8heVEjce7nISPC3ORu6F8KjC0GjjTVxl6gANHQ"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<p class="text-slate-400 font-medium">Transaction Visualization Placeholder</p>
+</div>
+</div>
+</main>
+</div>
+</body></html>

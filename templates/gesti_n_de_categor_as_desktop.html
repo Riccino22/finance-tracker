@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00c795",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#0f231e",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between border-b border-primary/20 bg-background-light dark:bg-background-dark px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<span class="material-symbols-outlined text-3xl">category</span>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">Admin Console</h2>
+</div>
+<label class="flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full bg-primary/10 border border-primary/20 focus-within:border-primary">
+<div class="text-primary flex items-center justify-center pl-3">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:outline-0 focus:ring-0 placeholder:text-slate-500 dark:placeholder:text-slate-400 px-3 text-sm font-normal" placeholder="Search references..."/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<nav class="flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#">References</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary pb-1" href="#">Categories</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary text-sm font-medium transition-colors" href="#">Settings</a>
+</nav>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary/10 text-primary hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary text-background-dark hover:opacity-90 transition-all">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 flex overflow-hidden">
+<!-- Left Sidebar: Category Management -->
+<aside class="w-80 border-r border-primary/10 bg-background-light dark:bg-background-dark/50 flex flex-col p-6 overflow-y-auto">
+<div class="mb-6">
+<h1 class="text-xl font-bold mb-1">Categories</h1>
+<p class="text-sm text-slate-500 dark:text-slate-400">Manage classification tags</p>
+</div>
+<div class="space-y-2 mb-8">
+<div class="flex items-center justify-between group p-2 rounded-lg bg-primary/20 border border-primary/30">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">tag</span>
+<span class="text-sm font-semibold">Scientific</span>
+</div>
+<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary"><span class="material-symbols-outlined text-xs">edit</span></button>
+<button class="p-1 hover:text-red-500"><span class="material-symbols-outlined text-xs">delete</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between group p-2 rounded-lg hover:bg-primary/5 border border-transparent transition-all">
+<div class="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-lg">tag</span>
+<span class="text-sm font-medium">Historical</span>
+</div>
+<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary"><span class="material-symbols-outlined text-xs">edit</span></button>
+<button class="p-1 hover:text-red-500"><span class="material-symbols-outlined text-xs">delete</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between group p-2 rounded-lg hover:bg-primary/5 border border-transparent transition-all">
+<div class="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-lg">tag</span>
+<span class="text-sm font-medium">Technical</span>
+</div>
+<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary"><span class="material-symbols-outlined text-xs">edit</span></button>
+<button class="p-1 hover:text-red-500"><span class="material-symbols-outlined text-xs">delete</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between group p-2 rounded-lg hover:bg-primary/5 border border-transparent transition-all">
+<div class="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-lg">tag</span>
+<span class="text-sm font-medium">Legal</span>
+</div>
+<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:text-primary"><span class="material-symbols-outlined text-xs">edit</span></button>
+<button class="p-1 hover:text-red-500"><span class="material-symbols-outlined text-xs">delete</span></button>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-primary/10">
+<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Add Category</label>
+<div class="flex gap-2">
+<input class="flex-1 rounded-lg bg-primary/5 border-primary/20 text-sm focus:ring-primary focus:border-primary px-3" placeholder="Category name..." type="text"/>
+<button class="bg-primary text-background-dark p-2 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Right Content: Reference Table -->
+<section class="flex-1 flex flex-col bg-background-light dark:bg-background-dark p-8 overflow-y-auto">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h2 class="text-2xl font-bold tracking-tight">Reference Library</h2>
+<p class="text-slate-500 dark:text-slate-400">Classify your documents and sources</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-lg font-bold text-sm hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-lg">filter_list</span> Filter
+                        </button>
+<button class="flex items-center gap-2 bg-primary text-background-dark px-4 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-lg">upload_file</span> New Entry
+                        </button>
+</div>
+</div>
+<!-- References Table -->
+<div class="bg-background-light dark:bg-background-dark/30 rounded-xl border border-primary/10 overflow-hidden mb-8">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-primary/5 border-b border-primary/10">
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Document Title</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Source Type</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Current Category</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-primary/5">
+<!-- Unclassified First -->
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-amber-500">warning</span>
+<span class="font-medium">Annual Environmental Impact Report 2023</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm">PDF Document</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                                        Unclassified
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<select class="bg-primary/10 border-none text-xs font-bold rounded-lg focus:ring-primary focus:border-primary text-slate-300">
+<option>Assign to...</option>
+<option>Scientific</option>
+<option>Technical</option>
+<option>Legal</option>
+</select>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-amber-500">warning</span>
+<span class="font-medium">Drafting Legislation: Article IV Protocol</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm">Text File</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                                        Unclassified
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<select class="bg-primary/10 border-none text-xs font-bold rounded-lg focus:ring-primary focus:border-primary text-slate-300">
+<option>Assign to...</option>
+<option>Scientific</option>
+<option>Technical</option>
+<option>Legal</option>
+</select>
+</td>
+</tr>
+<!-- Classified -->
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="font-medium text-slate-400">Quantum Computing Fundamentals v2</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">Publication</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/20 text-primary border border-primary/30">
+                                        Scientific
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<button class="text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="font-medium text-slate-400">Medieval Agrarian Structures Analysis</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">Historical Archive</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/20 text-primary border border-primary/30">
+                                        Historical
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<button class="text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Collapsible System Suggestions Section -->
+<div class="mt-4">
+<details class="group bg-primary/5 border border-primary/10 rounded-xl" open="">
+<summary class="flex items-center justify-between p-5 cursor-pointer list-none">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">lightbulb</span>
+<h3 class="text-lg font-bold">System Suggestions</h3>
+<span class="bg-primary/20 text-primary text-[10px] uppercase font-black px-2 py-0.5 rounded-full">AI Driven</span>
+</div>
+<span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-5 pb-5 space-y-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Cluster 1 -->
+<div class="bg-background-dark/50 border border-primary/10 p-4 rounded-lg flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-sm">Cluster: Research Papers</h4>
+<span class="text-[10px] font-bold text-slate-500 uppercase">12 Matches</span>
+</div>
+<p class="text-xs text-slate-400 mb-4">The system found 12 unclassified references containing scientific notation and peer-review patterns.</p>
+</div>
+<div class="flex items-center justify-between gap-3">
+<div class="flex items-center gap-1">
+<span class="text-xs font-medium">Proposed:</span>
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded border border-primary/30">Scientific</span>
+</div>
+<button class="bg-primary text-background-dark text-xs font-bold px-3 py-1.5 rounded-lg hover:opacity-90 transition-all">Apply All</button>
+</div>
+</div>
+<!-- Cluster 2 -->
+<div class="bg-background-dark/50 border border-primary/10 p-4 rounded-lg flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-sm">Cluster: Case Law</h4>
+<span class="text-[10px] font-bold text-slate-500 uppercase">5 Matches</span>
+</div>
+<p class="text-xs text-slate-400 mb-4">Detected legal terminology, citations, and court formatting in 5 new uploads.</p>
+</div>
+<div class="flex items-center justify-between gap-3">
+<div class="flex items-center gap-1">
+<span class="text-xs font-medium">Proposed:</span>
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded border border-primary/30">Legal</span>
+</div>
+<button class="bg-primary text-background-dark text-xs font-bold px-3 py-1.5 rounded-lg hover:opacity-90 transition-all">Apply All</button>
+</div>
+</div>
+</div>
+</div>
+</details>
+</div>
+</section>
+</main>
+</div>
+</body></html>
