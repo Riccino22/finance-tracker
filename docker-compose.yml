@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:16
+    container_name: banking_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-banking}
+      POSTGRES_USER: ${POSTGRES_USER:-banking_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-banking_pass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-banking_user} -d ${POSTGRES_DB:-banking}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+  api:
+    build: ./api
+    container_name: banking_api
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-banking_user}:${POSTGRES_PASSWORD:-banking_pass}@db:5432/${POSTGRES_DB:-banking}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/app
+
+  app:
+    build: ./app
+    container_name: banking_app
+    environment:
+      API_URL: http://api:8000
+    depends_on:
+      - api
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./app:/app
+
+  mcp:
+    build: ./mcp
+    container_name: banking_mcp
+    environment:
+      API_URL: http://api:8000
+      MCP_PORT: "8002"
+      MCP_TRANSPORT: "sse"
+      FASTMCP_HOST: "0.0.0.0"
+      FASTMCP_PORT: "8002"
+    depends_on:
+      - api
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./mcp:/app
+
+volumes:
+  postgres_data:
