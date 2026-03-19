@@ -42,21 +42,6 @@ services:
     volumes:
       - ./app:/app
 
-  mcp:
-    build: ./mcp
-    container_name: banking_mcp
-    environment:
-      API_URL: http://api:8000
-      MCP_PORT: "8002"
-      MCP_TRANSPORT: "sse"
-      FASTMCP_HOST: "0.0.0.0"
-      FASTMCP_PORT: "8002"
-    depends_on:
-      - api
-    ports:
-      - "8002:8002"
-    volumes:
-      - ./mcp:/app
 
 volumes:
   postgres_data:

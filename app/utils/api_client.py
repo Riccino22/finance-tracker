@@ -27,6 +27,12 @@ def _put(path: str, json: dict) -> Any:
     return r.json()
 
 
+def _patch(path: str, json: dict) -> Any:
+    r = httpx.patch(f"{API_URL}{path}", json=json, timeout=TIMEOUT)
+    r.raise_for_status()
+    return r.json()
+
+
 def _delete(path: str) -> None:
     r = httpx.delete(f"{API_URL}{path}", timeout=TIMEOUT)
     r.raise_for_status()
@@ -70,6 +76,10 @@ def get_transactions(
     if tipo:        params["tipo"]        = tipo
     if search:      params["search"]      = search
     return _get("/transactions/", params=params)
+
+
+def update_transaction_nota(transaction_id: int, nota: Optional[str]) -> dict:
+    return _patch(f"/transactions/{transaction_id}/nota", json={"nota": nota})
 
 
 # ── Categories ────────────────────────────────────────────────────────────────

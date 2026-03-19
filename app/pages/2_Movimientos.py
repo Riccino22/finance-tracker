@@ -142,8 +142,8 @@ if txs:
     for t in txs:
         cat = t.get("category")
         cat_name  = cat["name"]  if cat else "Sin categoría"
-        cat_color = cat["color"] if cat else "#94a3b8"
         rows.append({
+            "_id":         t["id"],
             "Fecha":       t.get("fecha_completa") or t.get("fecha", ""),
             "Tipo":        t.get("tipo", ""),
             "Descripción": t.get("descripcion", ""),
@@ -151,6 +151,7 @@ if txs:
             "Débito":      float(t["debito"])  if t.get("debito")  else None,
             "Crédito":     float(t["credito"]) if t.get("credito") else None,
             "Saldo":       float(t["saldo"])   if t.get("saldo")   else None,
+            "Nota":        t.get("nota") or "",
         })
 
     df_tx = pd.DataFrame(rows)
@@ -158,13 +159,14 @@ if txs:
     # Summary row
     total_deb = df_tx["Débito"].sum()
     total_cre = df_tx["Crédito"].sum()
+    tx_by_id  = {t["id"]: t for t in txs}
     c1, c2, c3 = st.columns(3)
     c1.metric("Movimientos", len(df_tx))
     c2.metric("Total débitos",  fmt_money(total_deb))
     c3.metric("Total créditos", fmt_money(total_cre))
 
     # Format for display
-    df_display = df_tx.copy()
+    df_display = df_tx.drop(columns=["_id"]).copy()
     df_display["Débito"]  = df_display["Débito"].apply(lambda x: fmt_money(x) if x else "—")
     df_display["Crédito"] = df_display["Crédito"].apply(lambda x: fmt_money(x) if x else "—")
     df_display["Saldo"]   = df_display["Saldo"].apply(lambda x: fmt_money(x) if x else "—")
@@ -182,17 +184,40 @@ if txs:
             "Débito":      st.column_config.TextColumn(width="small"),
             "Crédito":     st.column_config.TextColumn(width="small"),
             "Saldo":       st.column_config.TextColumn(width="medium"),
+            "Nota":        st.column_config.TextColumn(width="large"),
         },
     )
+
+    # ── Nota editor ───────────────────────────────────────────────────────────
+    with st.expander("📝 Agregar / editar nota en un movimiento"):
+        tx_options = {
+            f"{r['Fecha']}  ·  {r['Descripción'][:40]}": r["_id"]
+            for r in rows
+        }
+        sel_label = st.selectbox("Movimiento", list(tx_options.keys()), key="nota_select")
+        sel_id    = tx_options[sel_label]
+        current   = tx_by_id[sel_id].get("nota") or ""
+        nueva_nota = st.text_area("Nota", value=current, key="nota_text", height=80,
+                                  placeholder="Ej: cuota del auto, regalo cumpleaños, gasto compartido...")
+        if st.button("Guardar nota", key="nota_save"):
+            try:
+                api.update_transaction_nota(sel_id, nueva_nota or None)
+                st.success("Nota guardada.")
+                st.cache_data.clear()
+                st.rerun()
+            except Exception as e:
+                st.error(f"Error al guardar: {e}")
 
     # ── Export ────────────────────────────────────────────────────────────────
     st.markdown(section_title("Exportar datos"), unsafe_allow_html=True)
     col_csv, col_xlsx, _ = st.columns([1, 1, 4])
 
+    df_export = df_tx.drop(columns=["_id"])
+
     with col_csv:
         st.download_button(
             label="⬇ CSV",
-            data=df_tx.to_csv(index=False).encode("utf-8"),
+            data=df_export.to_csv(index=False).encode("utf-8"),
             file_name="movimientos.csv",
             mime="text/csv",
         )
@@ -200,7 +225,7 @@ if txs:
     with col_xlsx:
         xlsx_buf = io.BytesIO()
         with pd.ExcelWriter(xlsx_buf, engine="openpyxl") as writer:
-            df_tx.to_excel(writer, index=False, sheet_name="Movimientos")
+            df_export.to_excel(writer, index=False, sheet_name="Movimientos")
         st.download_button(
             label="⬇ Excel",
             data=xlsx_buf.getvalue(),

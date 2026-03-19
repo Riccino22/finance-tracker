@@ -1,6 +1,6 @@
 from sqlalchemy import (
     Column, Integer, String, Numeric, Date,
-    DateTime, ForeignKey, UniqueConstraint, func,
+    DateTime, ForeignKey, UniqueConstraint, Text, func,
 )
 from sqlalchemy.orm import relationship
 from database import Base
@@ -68,6 +68,7 @@ class Transaction(Base):
     debito         = Column(Numeric(15, 2))
     credito        = Column(Numeric(15, 2))
     saldo          = Column(Numeric(15, 2))
+    nota           = Column(Text, nullable=True)
     created_at     = Column(DateTime(timezone=True), server_default=func.now())
 
     statement = relationship("Statement", back_populates="transactions")

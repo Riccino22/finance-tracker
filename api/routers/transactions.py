@@ -1,12 +1,12 @@
 from __future__ import annotations
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from database import get_db
 from models import Transaction, Statement, ReferenceCatalog
-from schemas import TransactionOut
+from schemas import TransactionOut, TransactionNotaUpdate
 
 router = APIRouter()
 
@@ -28,6 +28,7 @@ def _tx_out(t: Transaction) -> dict:
         "debito": t.debito,
         "credito": t.credito,
         "saldo": t.saldo,
+        "nota": t.nota,
         "created_at": t.created_at,
     }
 
@@ -64,3 +65,18 @@ def list_transactions(
          .all()
     )
     return [TransactionOut.model_validate(_tx_out(t)) for t in txs]
+
+
+@router.patch("/{transaction_id}/nota", response_model=TransactionOut)
+def update_nota(
+    transaction_id: int,
+    body: TransactionNotaUpdate,
+    db: Session = Depends(get_db),
+):
+    tx = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+    if not tx:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    tx.nota = body.nota
+    db.commit()
+    db.refresh(tx)
+    return TransactionOut.model_validate(_tx_out(tx))

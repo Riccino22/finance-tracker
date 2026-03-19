@@ -12,6 +12,7 @@ Base.metadata.create_all(bind=engine)
 # Seguro de correr múltiples veces (IF NOT EXISTS / DO $$ ... END).
 _MIGRATION = """
 ALTER TABLE transactions ADD COLUMN IF NOT EXISTS position INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS nota TEXT;
 
 -- Asigna posiciones secuenciales a filas existentes que quedaron en 0
 UPDATE transactions t

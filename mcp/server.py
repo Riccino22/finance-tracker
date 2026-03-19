@@ -162,7 +162,9 @@ def _build_monthly_summary(year: int, month: int) -> str:
     for t in debits:
         cat = t.get("category")
         cat_name = cat["name"] if cat else "Sin categoría"
-        lines.append(f"  • {t.get('descripcion', '—')} — {_fmt(float(t.get('debito') or 0))} [{cat_name}]")
+        nota = t.get("nota") or ""
+        nota_str = f"  📝 {nota}" if nota else ""
+        lines.append(f"  • {t.get('descripcion', '—')} — {_fmt(float(t.get('debito') or 0))} [{cat_name}]{nota_str}")
 
     return "\n".join(lines)
 
@@ -453,9 +455,11 @@ def search_transactions(
         total_deb += deb
         total_cre += cre
         fecha = t.get("fecha_completa") or t.get("fecha", "")
+        nota  = t.get("nota") or ""
+        nota_str = f"  📝 {nota}" if nota else ""
         lines.append(
             f"{fecha:<12} {t.get('tipo',''):<20} {t.get('descripcion',''):<25} "
-            f"{(_fmt(deb) if deb else '—'):>12} {(_fmt(cre) if cre else '—'):>12} {cat:<18}"
+            f"{(_fmt(deb) if deb else '—'):>12} {(_fmt(cre) if cre else '—'):>12} {cat:<18}{nota_str}"
         )
     lines += [
         "─" * 102,
@@ -506,9 +510,11 @@ def get_largest_transactions(
         cat   = (t.get("category") or {}).get("name", "Sin categoría")
         monto = float(t.get(field) or 0)
         fecha = t.get("fecha_completa") or t.get("fecha", "")
+        nota  = t.get("nota") or ""
+        nota_str = f"  📝 {nota}" if nota else ""
         lines.append(
             f"  {i:2}. {fecha:<12} {t.get('descripcion',''):<28} "
-            f"{_fmt(monto):>14}  [{cat}]"
+            f"{_fmt(monto):>14}  [{cat}]{nota_str}"
         )
     return "\n".join(lines)
 
@@ -563,7 +569,9 @@ def get_transactions_by_category(
         cre = float(t.get("credito") or 0)
         fecha = t.get("fecha_completa") or t.get("fecha", "")
         signo = f"-{_fmt(deb)}" if deb else f"+{_fmt(cre)}"
-        lines.append(f"  {fecha:<12} {t.get('descripcion',''):<30} {signo:>16}")
+        nota  = t.get("nota") or ""
+        nota_str = f"  📝 {nota}" if nota else ""
+        lines.append(f"  {fecha:<12} {t.get('descripcion',''):<30} {signo:>16}{nota_str}")
     return "\n".join(lines)
 
 

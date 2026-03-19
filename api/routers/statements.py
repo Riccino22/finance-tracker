@@ -32,6 +32,7 @@ def _build_transaction_out(t: Transaction) -> dict:
         "debito": t.debito,
         "credito": t.credito,
         "saldo": t.saldo,
+        "nota": t.nota,
         "created_at": t.created_at,
     }
 

@@ -53,9 +53,13 @@ class TransactionOut(BaseModel):
     debito:         Optional[Decimal]
     credito:        Optional[Decimal]
     saldo:          Optional[Decimal]
+    nota:           Optional[str] = None
     created_at:     datetime
 
     model_config = {"from_attributes": True}
+
+class TransactionNotaUpdate(BaseModel):
+    nota: Optional[str] = None
 
 
 # ── Statements ───────────────────────────────────────────────────────────────
