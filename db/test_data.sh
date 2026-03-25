@@ -1,0 +1,1 @@
+docker exec -i banking_db psql -U banking_user -d banking < db/seed.sql
