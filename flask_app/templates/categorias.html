@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+{% set active_page = "categorias" %}
+{% block title %}Categorías{% endblock %}
+
+{% block content %}
+
+<!-- ── Header ──────────────────────────────────────────────────────────── -->
+<header class="h-20 border-b border-slate-800 flex items-center px-8
+               sticky top-0 bg-background-dark/80 backdrop-blur-md z-40">
+  <div>
+    <p class="text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-0.5">CONFIGURACIÓN</p>
+    <h1 class="text-2xl font-bold text-white">Categorías</h1>
+  </div>
+  <p class="ml-4 text-sm text-slate-500">
+    Gestioná las categorías y asignales referencias de tus movimientos.
+  </p>
+</header>
+
+<div class="flex flex-1 overflow-hidden" style="height: calc(100vh - 5rem - 1px);">
+
+  <!-- ── Left sidebar: Category management ───────────────────────────── -->
+  <aside class="w-80 border-r border-primary/10 bg-background-dark/50 flex flex-col p-6 overflow-y-auto flex-shrink-0">
+
+    <div class="mb-4">
+      <h2 class="text-lg font-bold text-white">Categorías</h2>
+      <p class="text-xs text-slate-500 mt-0.5">Gestioná las etiquetas de clasificación</p>
+    </div>
+
+    <!-- Add category form -->
+    <form action="/categorias/new" method="post" class="mb-6">
+      <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nueva categoría</p>
+      <div class="flex gap-2 mb-2">
+        <input type="text" name="name" placeholder="Nombre..."
+               class="flex-1 bg-primary/5 border border-primary/20 rounded-lg text-sm text-white
+                      placeholder-slate-500 px-3 py-2 focus:ring-1 focus:ring-primary focus:border-primary"
+               required>
+        <input type="color" name="color" value="#00c795"
+               class="w-10 h-10 rounded-lg border border-primary/20 bg-transparent cursor-pointer p-0.5">
+      </div>
+      <button type="submit"
+              class="w-full py-2 bg-primary text-background-dark text-xs font-bold rounded-lg
+                     hover:opacity-90 transition-opacity flex items-center justify-center gap-1">
+        <span class="material-symbols-outlined text-base">add</span>
+        Agregar categoría
+      </button>
+    </form>
+
+    <!-- Category list -->
+    <div class="space-y-1 flex-1">
+      {% if not categories %}
+        <p class="text-sm text-slate-500 text-center py-8">No hay categorías.</p>
+      {% else %}
+        {% for cat in categories %}
+        {% set ref_count = 0 %}
+        <div class="group p-2.5 rounded-lg border border-transparent hover:bg-primary/5
+                    hover:border-primary/10 transition-all" id="cat-row-{{ cat.id }}">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="w-3 h-3 rounded-sm flex-shrink-0"
+                    style="background: {{ cat.color }}"></span>
+              <span class="text-sm font-semibold text-slate-200 truncate">{{ cat.name }}</span>
+            </div>
+            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
+              <button onclick="openEditModal({{ cat.id }}, '{{ cat.name }}', '{{ cat.color }}')"
+                      class="p-1 rounded text-slate-500 hover:text-primary transition-colors">
+                <span class="material-symbols-outlined text-sm">edit</span>
+              </button>
+              <form action="/categorias/{{ cat.id }}/delete" method="post" class="inline"
+                    onsubmit="return confirm('¿Eliminar la categoría «{{ cat.name }}»?');">
+                <button type="submit"
+                        class="p-1 rounded text-slate-500 hover:text-rose-500 transition-colors">
+                  <span class="material-symbols-outlined text-sm">delete</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </aside>
+
+  <!-- ── Right: References table ─────────────────────────────────────── -->
+  <section class="flex-1 flex flex-col bg-background-dark p-8 overflow-y-auto">
+
+    <!-- Section header + filters -->
+    <div class="flex items-center justify-between mb-5">
+      <div>
+        <h2 class="text-xl font-bold text-white">Biblioteca de referencias</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Clasificá las descripciones de tus movimientos</p>
+      </div>
+      <!-- Stats -->
+      <div class="flex items-center gap-4 text-xs">
+        <span class="text-slate-500">Total: <b class="text-slate-200">{{ total_refs }}</b></span>
+        <span class="text-slate-500">Clasificadas: <b class="text-primary">{{ classified_refs }}</b></span>
+        <span class="text-slate-500">Sin clasificar:
+          <b class="{% if unclassified_refs > 0 %}text-amber-400{% else %}text-slate-400{% endif %}">
+            {{ unclassified_refs }}
+          </b>
+        </span>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <form method="get" action="/categorias" class="flex items-center gap-3 mb-5">
+      <div class="relative flex-1 max-w-sm">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2
+                     text-slate-400 text-lg">search</span>
+        <input type="text" name="search" value="{{ search_ref }}"
+               placeholder="Buscar referencias..."
+               class="w-full pl-10 pr-4 py-2 bg-primary/10 border border-primary/20 rounded-lg
+                      text-sm text-white placeholder-slate-500
+                      focus:ring-1 focus:ring-primary focus:border-primary">
+      </div>
+      <label class="flex items-center gap-2 cursor-pointer select-none">
+        <input type="checkbox" name="unclassified" value="1"
+               {% if only_unclassified %}checked{% endif %}
+               onchange="this.form.submit()"
+               class="w-4 h-4 rounded border-primary/30 bg-primary/10 text-primary
+                      focus:ring-primary focus:ring-1 cursor-pointer">
+        <span class="text-sm text-slate-400">Solo sin categoría</span>
+      </label>
+      <button type="submit"
+              class="px-4 py-2 bg-primary/10 text-primary text-xs font-bold rounded-lg
+                     hover:bg-primary/20 transition-colors flex items-center gap-1">
+        <span class="material-symbols-outlined text-base">filter_list</span>
+        Filtrar
+      </button>
+      {% if search_ref or only_unclassified %}
+        <a href="/categorias" class="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1">
+          <span class="material-symbols-outlined text-base">close</span> Limpiar
+        </a>
+      {% endif %}
+    </form>
+
+    <!-- References table -->
+    {% if refs_page %}
+    <div class="bg-background-dark/30 rounded-xl border border-primary/10 overflow-hidden mb-4">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-primary/5 border-b border-primary/10">
+            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Descripción</th>
+            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 w-44">Categoría actual</th>
+            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 w-48">Asignar</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-primary/5">
+          {% for ref in refs_page %}
+          {% set cat = cat_map.get(ref.get('category_id')) %}
+          <tr class="hover:bg-primary/5 transition-colors">
+
+            <!-- Description -->
+            <td class="px-6 py-3">
+              <div class="flex items-center gap-2">
+                {% if not ref.get('category_id') %}
+                  <span class="material-symbols-outlined text-amber-500 text-base flex-shrink-0">warning</span>
+                {% else %}
+                  <span class="material-symbols-outlined text-primary text-base flex-shrink-0">description</span>
+                {% endif %}
+                <span class="text-sm text-slate-200 truncate max-w-xs" title="{{ ref.descripcion }}">
+                  {{ ref.descripcion }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Current category badge -->
+            <td class="px-6 py-3">
+              {% if cat %}
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border"
+                      style="background: {{ cat.color }}22; color: {{ cat.color }}; border-color: {{ cat.color }}44;">
+                  {{ cat.name }}
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold
+                             bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                  Sin clasificar
+                </span>
+              {% endif %}
+            </td>
+
+            <!-- Assign dropdown -->
+            <td class="px-6 py-3">
+              <select class="ref-cat-select bg-primary/10 border-none text-xs font-bold rounded-lg
+                             focus:ring-1 focus:ring-primary text-slate-300 py-1.5 px-2 cursor-pointer w-full"
+                      data-ref-id="{{ ref.id }}"
+                      onchange="assignCategory(this)">
+                <option value="">Sin categoría</option>
+                {% for c in cat_map.values() %}
+                  <option value="{{ c.id }}"
+                          {% if ref.get('category_id') == c.id %}selected{% endif %}>
+                    {{ c.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </td>
+
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_ref_pages > 1 %}
+    <div class="flex items-center justify-between text-xs">
+      <p class="text-slate-500">
+        Página {{ ref_page }} de {{ total_ref_pages }} · {{ refs_total_filtered }} referencias
+      </p>
+      <div class="flex gap-2">
+        {% if ref_page > 1 %}
+          <a href="?ref_page={{ ref_page - 1 }}{% if search_ref %}&search={{ search_ref }}{% endif %}{% if only_unclassified %}&unclassified=1{% endif %}"
+             class="px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg hover:bg-primary/20 hover:text-primary transition-colors">
+            ← Anterior
+          </a>
+        {% endif %}
+        {% if ref_page < total_ref_pages %}
+          <a href="?ref_page={{ ref_page + 1 }}{% if search_ref %}&search={{ search_ref }}{% endif %}{% if only_unclassified %}&unclassified=1{% endif %}"
+             class="px-3 py-1.5 bg-primary text-background-dark font-bold rounded-lg hover:opacity-90 transition-opacity">
+            Siguiente →
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-sm text-slate-500 text-center py-16 flex flex-col items-center gap-2">
+      <span class="material-symbols-outlined text-3xl text-slate-700">search_off</span>
+      No hay referencias para mostrar{% if only_unclassified %}. ¡Todas están clasificadas!{% else %}.{% endif %}
+    </div>
+    {% endif %}
+
+  </section>
+</div>
+
+<!-- ── Edit category modal ─────────────────────────────────────────────── -->
+<div id="edit-modal"
+     class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+  <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-sm p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-bold text-white flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">edit</span>
+        Editar categoría
+      </h3>
+      <button onclick="closeEditModal()"
+              class="text-slate-400 hover:text-slate-100 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form id="edit-form" method="post" action="">
+      <div class="mb-4">
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nombre</label>
+        <input type="text" name="name" id="edit-name"
+               class="w-full bg-slate-800 border border-slate-700 rounded-lg text-sm text-white
+                      px-3 py-2 focus:ring-1 focus:ring-primary focus:border-primary">
+      </div>
+      <div class="mb-5">
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Color</label>
+        <div class="flex items-center gap-3">
+          <input type="color" name="color" id="edit-color"
+                 class="w-12 h-10 rounded-lg border border-slate-700 bg-transparent cursor-pointer p-0.5">
+          <input type="text" id="edit-color-text"
+                 class="flex-1 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white
+                        px-3 py-2 focus:ring-1 focus:ring-primary focus:border-primary font-mono"
+                 onchange="document.getElementById('edit-color').value = this.value">
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" onclick="closeEditModal()"
+                class="flex-1 py-2 bg-slate-800 text-slate-300 text-sm rounded-lg hover:bg-slate-700 transition-colors">
+          Cancelar
+        </button>
+        <button type="submit"
+                class="flex-1 py-2 bg-primary text-background-dark text-sm font-bold rounded-lg
+                       hover:opacity-90 transition-opacity">
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // ── Category edit modal ──────────────────────────────────────────────
+  function openEditModal(catId, name, color) {
+    document.getElementById('edit-form').action = `/categorias/${catId}/edit`;
+    document.getElementById('edit-name').value  = name;
+    document.getElementById('edit-color').value = color;
+    document.getElementById('edit-color-text').value = color;
+    document.getElementById('edit-modal').classList.remove('hidden');
+  }
+
+  function closeEditModal() {
+    document.getElementById('edit-modal').classList.add('hidden');
+  }
+
+  document.getElementById('edit-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditModal();
+  });
+
+  // Sync color picker ↔ text input
+  document.getElementById('edit-color').addEventListener('input', function() {
+    document.getElementById('edit-color-text').value = this.value;
+  });
+
+  // ── Reference category assignment ───────────────────────────────────
+  async function assignCategory(select) {
+    const refId  = select.dataset.refId;
+    const catId  = select.value;
+    const body   = new FormData();
+    body.append('category_id', catId);
+
+    select.disabled = true;
+    try {
+      const r = await fetch(`/categorias/references/${refId}/assign`, {
+        method: 'POST', body,
+      });
+      const data = await r.json();
+      if (!data.ok) throw new Error(data.error);
+      // Visual feedback: briefly flash the row
+      const row = select.closest('tr');
+      if (row) {
+        row.style.transition = 'background 0.3s';
+        row.style.background = 'rgba(0,199,149,0.08)';
+        setTimeout(() => row.style.background = '', 600);
+      }
+    } catch(e) {
+      alert('Error al asignar categoría: ' + e.message);
+    }
+    select.disabled = false;
+  }
+</script>
+{% endblock %}

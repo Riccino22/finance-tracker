@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% set active_page = "index" %}
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<header class="h-20 border-b border-slate-800 flex items-center px-8
+               sticky top-0 bg-background-dark/80 backdrop-blur-md z-40">
+  <div>
+    <p class="text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-0.5">BIENVENIDO</p>
+    <h1 class="text-2xl font-bold text-white leading-tight">Dashboard Financiero</h1>
+  </div>
+  <p class="ml-auto text-sm text-slate-500">
+    Visualizá y analizá tus movimientos bancarios de Itaú Uruguay.
+  </p>
+</header>
+
+<div class="p-8 space-y-10">
+
+  <!-- KPI row -->
+  <div class="grid grid-cols-4 gap-6">
+    <div class="p-6 rounded-xl bg-slate-900/50 border border-slate-800">
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-widest mb-2">Extractos cargados</p>
+      <h3 class="text-3xl font-bold text-white">{{ stmts|length }}</h3>
+    </div>
+    <div class="p-6 rounded-xl bg-slate-900/50 border border-slate-800">
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-widest mb-2">Total movimientos</p>
+      <h3 class="text-3xl font-bold text-blue-400">{{ total_tx }}</h3>
+    </div>
+    <div class="p-6 rounded-xl bg-slate-900/50 border border-slate-800">
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-widest mb-2">Último extracto</p>
+      <h3 class="text-3xl font-bold text-violet-400">
+        {% if stmts %}{{ MONTH_NAMES[stmts[0].month] }} {{ stmts[0].year }}{% else %}—{% endif %}
+      </h3>
+    </div>
+    <div class="p-6 rounded-xl bg-slate-900/50 border border-slate-800">
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-widest mb-2">Saldo cierre último mes</p>
+      <h3 class="text-3xl font-bold text-primary">
+        {% if stmts %}{{ fmt_money(stmts[0].get('saldo_cierre')) }}{% else %}—{% endif %}
+      </h3>
+    </div>
+  </div>
+
+  <!-- Quick access -->
+  <div>
+    <p class="text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-4">Accesos rápidos</p>
+    <div class="grid grid-cols-3 gap-6">
+
+      <a href="/dashboard"
+         class="block p-6 rounded-xl bg-slate-900/50 border border-slate-800
+                hover:border-blue-500/40 hover:bg-blue-500/5 transition-all group">
+        <span class="material-symbols-outlined text-3xl text-blue-400 mb-3 block">dashboard</span>
+        <p class="font-bold text-white mb-1">Dashboard</p>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          6 gráficos interactivos: evolución de saldo, heatmap de gastos, proyección y más.
+        </p>
+        <p class="text-xs text-blue-400 font-semibold mt-3 group-hover:underline">Ver Dashboard →</p>
+      </a>
+
+      <a href="/movimientos"
+         class="block p-6 rounded-xl bg-slate-900/50 border border-slate-800
+                hover:border-amber-500/40 hover:bg-amber-500/5 transition-all group">
+        <span class="material-symbols-outlined text-3xl text-amber-400 mb-3 block">receipt_long</span>
+        <p class="font-bold text-white mb-1">Movimientos</p>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          Subí el PDF del mes, explorá tus transacciones y exportá a CSV/Excel.
+        </p>
+        <p class="text-xs text-amber-400 font-semibold mt-3 group-hover:underline">Ver Movimientos →</p>
+      </a>
+
+      <a href="/categorias"
+         class="block p-6 rounded-xl bg-slate-900/50 border border-slate-800
+                hover:border-pink-500/40 hover:bg-pink-500/5 transition-all group">
+        <span class="material-symbols-outlined text-3xl text-pink-400 mb-3 block">category</span>
+        <p class="font-bold text-white mb-1">Categorías</p>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          Clasificá tus referencias por categorías para mejores análisis.
+        </p>
+        <p class="text-xs text-pink-400 font-semibold mt-3 group-hover:underline">Gestionar Categorías →</p>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- Statements table -->
+  {% if stmts %}
+  <div>
+    <p class="text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-4">Extractos cargados</p>
+    <div class="bg-slate-900/30 rounded-xl border border-primary/5 overflow-hidden">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-800/50 border-b border-primary/10">
+            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Período</th>
+            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Cuenta</th>
+            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Saldo apertura</th>
+            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Saldo cierre</th>
+            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Movimientos</th>
+            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Subido</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-primary/5">
+          {% for s in stmts %}
+          <tr class="hover:bg-primary/5 transition-colors">
+            <td class="px-6 py-4 text-sm font-semibold text-white">
+              {{ MONTH_NAMES[s.month] }} {{ s.year }}
+            </td>
+            <td class="px-6 py-4 text-sm text-slate-400">{{ s.get('account_name') or '—' }}</td>
+            <td class="px-6 py-4 text-sm text-slate-300 text-right font-mono">
+              {{ fmt_money(s.get('saldo_apertura')) }}
+            </td>
+            <td class="px-6 py-4 text-sm text-primary font-semibold text-right font-mono">
+              {{ fmt_money(s.get('saldo_cierre')) }}
+            </td>
+            <td class="px-6 py-4 text-sm text-slate-400 text-center">
+              {{ s.get('transaction_count', 0) }}
+            </td>
+            <td class="px-6 py-4 text-sm text-slate-500">
+              {{ (s.get('uploaded_at') or '')[:10] }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="p-5 rounded-xl bg-blue-950/40 border border-blue-700/20 text-blue-400 text-sm flex items-center gap-3">
+    <span class="material-symbols-outlined">info</span>
+    Todavía no hay extractos cargados.
+    <a href="/movimientos" class="font-bold underline">Andá a Movimientos</a> para subir tu primer PDF.
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

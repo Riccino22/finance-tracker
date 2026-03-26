@@ -42,6 +42,18 @@ services:
     volumes:
       - ./app:/app
 
+  flask_app:
+    build: ./flask_app
+    container_name: banking_flask
+    environment:
+      API_URL: http://api:8000
+    depends_on:
+      - api
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./flask_app:/app
+
 
 volumes:
   postgres_data:

@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+{% set active_page = "movimientos" %}
+{% block title %}Movimientos{% endblock %}
+
+{% block content %}
+
+<!-- ── Header ──────────────────────────────────────────────────────────── -->
+<header class="h-20 border-b border-slate-800 flex items-center justify-between px-8
+               sticky top-0 bg-background-dark/80 backdrop-blur-md z-40">
+  <div>
+    <p class="text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-0.5">EXTRACTOS BANCARIOS</p>
+    <h1 class="text-2xl font-bold text-white">Movimientos</h1>
+  </div>
+  <!-- Export buttons -->
+  <div class="flex items-center gap-2">
+    <a href="/movimientos/export?fmt=csv{% if year_f %}&year={{ year_f }}{% endif %}{% if month_f %}&month={{ month_f }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+       class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700
+              text-slate-300 text-xs font-medium hover:border-primary/40 transition-colors">
+      <span class="material-symbols-outlined text-base">download</span> CSV
+    </a>
+    <a href="/movimientos/export?fmt=xlsx{% if year_f %}&year={{ year_f }}{% endif %}{% if month_f %}&month={{ month_f }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+       class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700
+              text-slate-300 text-xs font-medium hover:border-primary/40 transition-colors">
+      <span class="material-symbols-outlined text-base">table_view</span> Excel
+    </a>
+  </div>
+</header>
+
+<div class="p-8 space-y-8">
+
+  <!-- ── Upload area ─────────────────────────────────────────────────── -->
+  <section>
+    <p class="text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-3">
+      Subir nuevo extracto
+    </p>
+    <form action="/movimientos/upload" method="post" enctype="multipart/form-data" id="upload-form">
+      <label for="file-input"
+             class="flex flex-col items-center justify-center gap-3 p-8 rounded-xl
+                    border-2 border-dashed border-primary/20 bg-primary/5
+                    hover:border-primary/40 hover:bg-primary/10 transition-all cursor-pointer group">
+        <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center
+                    text-primary group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-3xl">upload_file</span>
+        </div>
+        <div class="text-center">
+          <p class="text-base font-semibold text-white">Subir estado de cuenta Itaú</p>
+          <p class="text-sm text-slate-400 mt-1">
+            Arrastrá y soltá o hacé clic para seleccionar un archivo
+          </p>
+          <p class="text-xs text-slate-600 mt-1">PDF, XLS o XLSX · Detección automática de duplicados</p>
+        </div>
+        <input id="file-input" name="file" type="file" accept=".pdf,.xls,.xlsx" class="hidden"
+               onchange="document.getElementById('file-label').textContent = this.files[0]?.name || 'Ningún archivo seleccionado'; document.getElementById('upload-form').submit();">
+        <span id="file-label" class="text-xs text-slate-500">Ningún archivo seleccionado</span>
+      </label>
+    </form>
+  </section>
+
+  <!-- ── Statements cards ────────────────────────────────────────────── -->
+  {% if stmts %}
+  <section>
+    <div class="flex items-center justify-between mb-3">
+      <p class="text-[10px] font-bold tracking-widest uppercase text-slate-500">Extractos cargados</p>
+      <!-- Delete dropdown -->
+      <details class="relative group">
+        <summary class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700
+                        text-rose-400 text-xs font-medium cursor-pointer hover:border-rose-700/50 transition-colors list-none">
+          <span class="material-symbols-outlined text-base">delete</span>
+          Eliminar extracto
+          <span class="material-symbols-outlined text-sm">expand_more</span>
+        </summary>
+        <div class="absolute right-0 top-9 w-80 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-20 p-4">
+          <p class="text-xs font-bold text-slate-400 mb-3">Seleccioná el extracto a eliminar</p>
+          <form method="post" id="delete-form" action="/movimientos/delete/0">
+            <select id="delete-select" class="w-full bg-slate-800 border border-slate-700 text-sm text-white
+                           rounded-lg focus:ring-primary focus:border-primary mb-3 px-3 py-2">
+              {% for s in stmts %}
+              <option value="{{ s.id }}">
+                {{ MONTH_NAMES[s.month] }} {{ s.year }} (id={{ s.id }})
+              </option>
+              {% endfor %}
+            </select>
+            <button type="button" onclick="confirmDelete()"
+                    class="w-full py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition-colors">
+              Eliminar
+            </button>
+          </form>
+        </div>
+      </details>
+    </div>
+    <div class="grid grid-cols-4 gap-4">
+      {% for s in stmts[:8] %}
+      <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-primary/20 transition-colors">
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+          {{ MONTH_NAMES[s.month] }} {{ s.year }}
+        </p>
+        <p class="text-lg font-bold text-primary font-mono">{{ fmt_money(s.get('saldo_cierre')) }}</p>
+        <p class="text-xs text-slate-500 mt-1">{{ s.get('transaction_count', 0) }} movimientos</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ── Filters ─────────────────────────────────────────────────────── -->
+  <section>
+    <form method="get" action="/movimientos" class="flex flex-wrap items-center gap-3
+           bg-slate-900/30 p-4 rounded-xl border border-primary/5">
+
+      <!-- Search -->
+      <div class="flex-1 min-w-52 relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2
+                     text-slate-400 text-lg">search</span>
+        <input type="text" name="search" value="{{ search }}"
+               placeholder="Buscar descripción..."
+               class="w-full pl-10 pr-4 py-2 bg-background-dark border border-primary/10
+                      rounded-lg text-sm text-white placeholder-slate-500
+                      focus:ring-1 focus:ring-primary focus:border-primary">
+      </div>
+
+      <!-- Year -->
+      <select name="year"
+              class="bg-background-dark border border-primary/10 rounded-lg text-sm text-white
+                     focus:ring-1 focus:ring-primary focus:border-primary py-2 px-3">
+        <option value="">Todos los años</option>
+        {% for y in years %}
+          <option value="{{ y }}" {% if year_f == y %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+      </select>
+
+      <!-- Month -->
+      <select name="month"
+              class="bg-background-dark border border-primary/10 rounded-lg text-sm text-white
+                     focus:ring-1 focus:ring-primary focus:border-primary py-2 px-3">
+        <option value="">Todos los meses</option>
+        {% for m in range(1, 13) %}
+          <option value="{{ m }}" {% if month_f == m %}selected{% endif %}>
+            {{ '%02d'|format(m) }} – {{ MONTH_NAMES[m] }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <button type="submit"
+              class="px-4 py-2 bg-primary text-background-dark text-sm font-bold rounded-lg
+                     hover:opacity-90 transition-opacity">
+        Filtrar
+      </button>
+      {% if year_f or month_f or search %}
+        <a href="/movimientos" class="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1">
+          <span class="material-symbols-outlined text-base">close</span> Limpiar
+        </a>
+      {% endif %}
+    </form>
+  </section>
+
+  <!-- ── Summary metrics ─────────────────────────────────────────────── -->
+  <div class="grid grid-cols-3 gap-4">
+    <div class="p-4 rounded-xl bg-slate-900/30 border border-slate-800 text-center">
+      <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Movimientos</p>
+      <p class="text-xl font-bold text-white">{{ tx_count }}</p>
+    </div>
+    <div class="p-4 rounded-xl bg-slate-900/30 border border-slate-800 text-center">
+      <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Total débitos</p>
+      <p class="text-xl font-bold text-rose-400 font-mono">{{ total_deb }}</p>
+    </div>
+    <div class="p-4 rounded-xl bg-slate-900/30 border border-slate-800 text-center">
+      <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Total créditos</p>
+      <p class="text-xl font-bold text-primary font-mono">{{ total_cre }}</p>
+    </div>
+  </div>
+
+  <!-- ── Transaction table ───────────────────────────────────────────── -->
+  {% if txs %}
+  <section class="bg-slate-900/30 rounded-xl border border-primary/5 overflow-hidden">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-slate-800/50 border-b border-primary/10">
+          <th class="px-4 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-24">Fecha</th>
+          <th class="px-4 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-16">Tipo</th>
+          <th class="px-4 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Descripción</th>
+          <th class="px-4 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Categoría</th>
+          <th class="px-4 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right w-28">Débito</th>
+          <th class="px-4 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right w-28">Crédito</th>
+          <th class="px-4 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right w-28">Saldo</th>
+          <th class="px-4 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-10">Nota</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-primary/5">
+        {% for t in txs %}
+        {% set cat = t.get('category') %}
+        <tr class="hover:bg-primary/5 transition-colors group" data-tx-id="{{ t.id }}"
+            data-nota="{{ t.get('nota') or '' }}">
+          <td class="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
+            {{ t.get('fecha_completa') or t.get('fecha', '') }}
+          </td>
+          <td class="px-4 py-3">
+            {% if t.get('tipo') %}
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold
+                         {% if 'CR' in t.tipo|upper or 'ACRED' in t.tipo|upper %}
+                           bg-primary/10 text-primary
+                         {% else %}
+                           bg-slate-800 text-slate-400
+                         {% endif %}">
+              {{ t.tipo }}
+            </span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-sm text-slate-200 max-w-xs">
+            <div class="truncate" title="{{ t.get('descripcion', '') }}">{{ t.get('descripcion', '') }}</div>
+          </td>
+          <td class="px-4 py-3">
+            {% if cat %}
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    style="background: {{ cat.color }}22; color: {{ cat.color }}; border: 1px solid {{ cat.color }}44;">
+                {{ cat.name }}
+              </span>
+            {% else %}
+              <span class="text-xs text-slate-600">Sin categoría</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-right text-sm font-mono {% if t.get('debito') %}text-rose-400{% else %}text-slate-600{% endif %}">
+            {% if t.get('debito') %}{{ fmt_money(t.debito) }}{% else %}—{% endif %}
+          </td>
+          <td class="px-4 py-3 text-right text-sm font-mono {% if t.get('credito') %}text-primary{% else %}text-slate-600{% endif %}">
+            {% if t.get('credito') %}{{ fmt_money(t.credito) }}{% else %}—{% endif %}
+          </td>
+          <td class="px-4 py-3 text-right text-sm font-mono text-slate-300">
+            {% if t.get('saldo') %}{{ fmt_money(t.saldo) }}{% else %}—{% endif %}
+          </td>
+          <td class="px-4 py-3 text-center">
+            <button onclick="openNotaModal({{ t.id }}, this.closest('tr').dataset.nota)"
+                    class="p-1 rounded text-slate-600 hover:text-primary transition-colors"
+                    title="{{ t.get('nota') or 'Agregar nota' }}">
+              <span class="material-symbols-outlined text-base">
+                {% if t.get('nota') %}edit_note{% else %}add_comment{% endif %}
+              </span>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="px-6 py-4 border-t border-primary/10 flex items-center justify-between">
+      <p class="text-xs text-slate-500">
+        Página {{ page }} de {{ total_pages }} · {{ tx_count }} movimientos
+      </p>
+      <div class="flex gap-2">
+        {% if page > 1 %}
+          <a href="?page={{ page - 1 }}{% if year_f %}&year={{ year_f }}{% endif %}{% if month_f %}&month={{ month_f }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+             class="px-3 py-1 bg-slate-800 text-slate-300 text-xs font-medium rounded
+                    hover:bg-primary hover:text-background-dark transition-colors">
+            ← Anterior
+          </a>
+        {% endif %}
+        {% if page < total_pages %}
+          <a href="?page={{ page + 1 }}{% if year_f %}&year={{ year_f }}{% endif %}{% if month_f %}&month={{ month_f }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+             class="px-3 py-1 bg-primary text-background-dark text-xs font-bold rounded
+                    hover:opacity-90 transition-opacity">
+            Siguiente →
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </section>
+  {% else %}
+  <div class="p-5 rounded-xl bg-slate-900/30 border border-slate-800 text-slate-500 text-sm text-center py-16">
+    <span class="material-symbols-outlined text-3xl block mb-2 text-slate-700">receipt_long</span>
+    No hay movimientos para los filtros seleccionados.
+  </div>
+  {% endif %}
+
+</div>
+
+<!-- ── Nota modal ───────────────────────────────────────────────────────── -->
+<div id="nota-modal"
+     class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+  <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-md p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-bold text-white flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">edit_note</span>
+        Nota del movimiento
+      </h3>
+      <button onclick="closeNotaModal()"
+              class="text-slate-400 hover:text-slate-100 transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form id="nota-form">
+      <input type="hidden" id="nota-tx-id" value="">
+      <textarea id="nota-text" rows="4"
+                placeholder="Ej: cuota del auto, regalo cumpleaños, gasto compartido..."
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg text-sm text-white
+                       placeholder-slate-500 px-3 py-2 focus:ring-1 focus:ring-primary
+                       focus:border-primary resize-none mb-4"></textarea>
+      <div class="flex gap-2 justify-end">
+        <button type="button" onclick="closeNotaModal()"
+                class="px-4 py-2 bg-slate-800 text-slate-300 text-sm rounded-lg hover:bg-slate-700 transition-colors">
+          Cancelar
+        </button>
+        <button type="button" onclick="saveNota()"
+                class="px-4 py-2 bg-primary text-background-dark text-sm font-bold rounded-lg
+                       hover:opacity-90 transition-opacity">
+          Guardar nota
+        </button>
+      </div>
+    </form>
+    <p id="nota-status" class="text-xs text-slate-500 mt-2 text-center hidden"></p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // ── Nota modal ──────────────────────────────────────────────────────────
+  function openNotaModal(txId, currentNota) {
+    document.getElementById('nota-tx-id').value = txId;
+    document.getElementById('nota-text').value   = currentNota || '';
+    document.getElementById('nota-status').classList.add('hidden');
+    document.getElementById('nota-modal').classList.remove('hidden');
+    setTimeout(() => document.getElementById('nota-text').focus(), 50);
+  }
+
+  function closeNotaModal() {
+    document.getElementById('nota-modal').classList.add('hidden');
+  }
+
+  async function saveNota() {
+    const txId = document.getElementById('nota-tx-id').value;
+    const nota = document.getElementById('nota-text').value.trim();
+    const status = document.getElementById('nota-status');
+    const btn = document.querySelector('#nota-form button[onclick="saveNota()"]');
+
+    btn.textContent = 'Guardando...';
+    btn.disabled = true;
+
+    try {
+      const body = new FormData();
+      body.append('nota', nota);
+      const r = await fetch(`/movimientos/${txId}/nota`, { method: 'POST', body });
+      const data = await r.json();
+      if (data.ok) {
+        status.textContent = '✓ Nota guardada';
+        status.className = 'text-xs text-primary mt-2 text-center';
+        status.classList.remove('hidden');
+        // Update the button icon in the table row
+        const row = document.querySelector(`tr[data-tx-id="${txId}"]`);
+        if (row) {
+          row.dataset.nota = nota;
+          const icon = row.querySelector('.material-symbols-outlined');
+          if (icon) icon.textContent = nota ? 'edit_note' : 'add_comment';
+        }
+        setTimeout(closeNotaModal, 800);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch(e) {
+      status.textContent = '✗ Error: ' + e.message;
+      status.className = 'text-xs text-rose-400 mt-2 text-center';
+      status.classList.remove('hidden');
+    }
+    btn.textContent = 'Guardar nota';
+    btn.disabled = false;
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('nota-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeNotaModal();
+  });
+
+  // ── Delete statement ────────────────────────────────────────────────────
+  function confirmDelete() {
+    const sel = document.getElementById('delete-select');
+    if (!sel || !sel.value) return;
+    if (!confirm('¿Seguro que querés eliminar este extracto y todos sus movimientos?')) return;
+    const form = document.getElementById('delete-form');
+    form.action = `/movimientos/delete/${sel.value}`;
+    form.submit();
+  }
+</script>
+{% endblock %}

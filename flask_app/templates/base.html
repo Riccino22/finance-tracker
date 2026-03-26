@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}FinTrack{% endblock %} · Itaú</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary":          "#00c795",
+            "background-light": "#f5f8f8",
+            "background-dark":  "#0E1117",
+          },
+          fontFamily: { display: ["Inter", "sans-serif"] },
+          borderRadius: {
+            DEFAULT: "0.25rem", lg: "0.5rem",
+            xl: "0.75rem", full: "9999px",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    /* Flash fade-out */
+    .flash-msg { animation: fadeOut 0.4s ease 4s forwards; }
+    @keyframes fadeOut { to { opacity: 0; pointer-events: none; } }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-background-dark text-slate-100 antialiased">
+<div class="flex min-h-screen">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+  <aside class="w-64 border-r border-slate-800 flex flex-col fixed h-full bg-background-dark z-50">
+
+    <!-- Logo -->
+    <div class="p-6 flex items-center gap-3">
+      <div class="w-9 h-9 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+        <span class="material-symbols-outlined text-background-dark text-xl font-bold">query_stats</span>
+      </div>
+      <div>
+        <h1 class="text-base font-bold tracking-tight text-white leading-none">FinTrack</h1>
+        <p class="text-[10px] text-slate-500 mt-0.5">Itaú · Dashboard</p>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 px-4 space-y-1 mt-1">
+      {% set nav = [
+        ("index",      "home",         "Inicio",      "/"),
+        ("dashboard",  "dashboard",    "Dashboard",   "/dashboard"),
+        ("movimientos","receipt_long", "Movimientos", "/movimientos"),
+        ("categorias", "category",     "Categorías",  "/categorias"),
+      ] %}
+      {% for pid, icon, label, href in nav %}
+        <a href="{{ href }}"
+           class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium
+                  {% if active_page == pid %}
+                    bg-primary/10 text-primary
+                  {% else %}
+                    text-slate-400 hover:bg-slate-800 hover:text-slate-100
+                  {% endif %}">
+          <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
+          {{ label }}
+        </a>
+      {% endfor %}
+    </nav>
+
+    <!-- API status -->
+    <div class="p-4 mt-auto">
+      <div class="p-3 rounded-xl bg-slate-800/50 border border-slate-800 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full flex-shrink-0
+                     {% if api_ok %}bg-primary animate-pulse{% else %}bg-rose-500{% endif %}"></span>
+        <span class="text-xs text-slate-400">
+          API {% if api_ok %}Conectado{% else %}Sin conexión{% endif %}
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ────────────────────────────────────────────────────────────── -->
+  <main class="ml-64 flex-1 flex flex-col min-h-screen overflow-y-auto">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="fixed top-4 right-4 z-50 space-y-2 w-96 pointer-events-none">
+          {% for cat, msg in messages %}
+            <div class="flash-msg pointer-events-auto p-4 rounded-xl border text-sm font-medium flex items-start gap-2 shadow-xl
+                        {% if cat == 'error' %}bg-rose-950 border-rose-700/50 text-rose-300
+                        {% elif cat == 'info'  %}bg-blue-950 border-blue-700/50 text-blue-300
+                        {% else %}bg-emerald-950 border-emerald-700/50 text-emerald-300{% endif %}">
+              <span class="material-symbols-outlined text-base mt-0.5">
+                {% if cat == 'error' %}error{% elif cat == 'info' %}info{% else %}check_circle{% endif %}
+              </span>
+              <span>{{ msg }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <footer class="mt-auto px-8 py-5 border-t border-slate-800 text-[10px] text-slate-700 flex justify-between">
+      <span>© 2024 FinTrack · Itaú Dashboard</span>
+      <span class="text-slate-800">v2.0 Flask</span>
+    </footer>
+  </main>
+</div>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
