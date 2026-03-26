@@ -69,7 +69,7 @@ def get_transactions(
     search: Optional[str] = None,
     limit: int = 2000,
 ) -> list[dict]:
-    params = {"limit": limit}
+    params: dict = {"limit": limit}
     if year:        params["year"]        = year
     if month:       params["month"]       = month
     if category_id: params["category_id"] = category_id
@@ -93,7 +93,7 @@ def create_category(name: str, color: str = "#00c795") -> dict:
 
 
 def update_category(category_id: int, name: str | None = None, color: str | None = None) -> dict:
-    payload = {}
+    payload: dict = {}
     if name:  payload["name"]  = name
     if color: payload["color"] = color
     return _put(f"/categories/{category_id}", json=payload)
@@ -122,7 +122,7 @@ def get_yearly_credits_avg() -> list[dict]:
 
 
 def get_category_breakdown(year: Optional[int] = None, month: Optional[int] = None) -> list[dict]:
-    params = {}
+    params: dict = {}
     if year:  params["year"]  = year
     if month: params["month"] = month
     return _get("/analytics/category-breakdown", params=params)
@@ -133,14 +133,14 @@ def get_avg_vs_closing() -> list[dict]:
 
 
 def get_heatmap(year: Optional[int] = None, month: Optional[int] = None) -> list[dict]:
-    params = {}
+    params: dict = {}
     if year:  params["year"]  = year
     if month: params["month"] = month
     return _get("/analytics/heatmap", params=params)
 
 
 def get_projection(year: Optional[int] = None, month: Optional[int] = None) -> dict:
-    params = {}
+    params: dict = {}
     if year:  params["year"]  = year
     if month: params["month"] = month
     return _get("/analytics/projection", params=params)

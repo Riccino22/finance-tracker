@@ -1,5 +1,5 @@
 """
-Excel parser for Itaú Uruguay bank statements (.xls).
+Excel parser for bank statements (.xls).
 Mirrors the output format of pdf_parser.parse_statement().
 """
 from __future__ import annotations
@@ -73,7 +73,7 @@ def _float_or_none(val) -> Optional[float]:
 
 def parse_excel_statement(file_bytes: bytes, filename: str = "") -> dict:
     """
-    Parse an Itaú Uruguay bank statement Excel file (.xls / .xlsx).
+    Parse a bank statement Excel file (.xls / .xlsx).
     Returns the same structure as pdf_parser.parse_statement().
     """
     import io
@@ -87,7 +87,7 @@ def parse_excel_statement(file_bytes: bytes, filename: str = "") -> dict:
     raw = xl.parse(xl.sheet_names[0], header=None)
 
     if raw.shape[0] < 8 or raw.shape[1] < 7:
-        raise ValueError("El Excel no tiene el formato esperado de estado de cuenta Itaú.")
+        raise ValueError("El Excel no tiene el formato esperado de estado de cuenta.")
 
     # ── Metadatos de la cuenta (fila 4) ──────────────────────────────────────
     def cell(r, c, default=""):
@@ -97,7 +97,7 @@ def parse_excel_statement(file_bytes: bytes, filename: str = "") -> dict:
         except Exception:
             return default
 
-    cuenta = cell(4, 1) or "CUENTA ITAÚ"
+    cuenta = cell(4, 1) or "CUENTA BANCO"
 
     # ── Filas de transacciones (desde fila 7 en adelante) ────────────────────
     saldo_apertura: Optional[float] = None

@@ -30,17 +30,17 @@ services:
     volumes:
       - ./api:/app
 
-  app:
-    build: ./app
-    container_name: banking_app
+  flask_app:
+    build: ./flask_app
+    container_name: banking_flask
     environment:
       API_URL: http://api:8000
     depends_on:
       - api
     ports:
-      - "8501:8501"
+      - "5000:5000"
     volumes:
-      - ./app:/app
+      - ./flask_app:/app
 
 
 volumes:

@@ -41,8 +41,8 @@ with engine.begin() as conn:
     conn.execute(text(_MIGRATION))
 
 app = FastAPI(
-    title="Itaú Dashboard API",
-    description="REST API para el dashboard de movimientos bancarios Itaú",
+    title="Banco Dashboard API",
+    description="REST API para el dashboard de movimientos bancarios",
     version="1.0.0",
 )
 
