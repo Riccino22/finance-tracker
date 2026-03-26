@@ -1,5 +1,5 @@
 """
-MCP Server – Itaú Dashboard
+MCP Server – Banco Dashboard
 Permite consultas conversacionales sobre movimientos bancarios.
 
 Transports:
@@ -10,7 +10,7 @@ Conexión desde Claude Desktop (SSE):
   Agrega en ~/.config/claude/claude_desktop_config.json:
   {
     "mcpServers": {
-      "itau-dashboard": {
+      "banco-dashboard": {
         "transport": "sse",
         "url": "http://localhost:8002/sse"
       }
@@ -34,8 +34,8 @@ MCP_TRANSPORT = os.getenv("MCP_TRANSPORT", "sse")
 MONTH_NAMES = ["", "Ene", "Feb", "Mar", "Abr", "May", "Jun",
                "Jul", "Ago", "Set", "Oct", "Nov", "Dic"]
 
-mcp = FastMCP("itau-dashboard", instructions="""
-Sos un asistente financiero personal que analiza los movimientos bancarios de Itaú Uruguay.
+mcp = FastMCP("banco-dashboard", instructions="""
+Sos un asistente financiero personal que analiza los movimientos bancarios.
 Tenés acceso a datos reales de la cuenta: movimientos, saldos, categorías y tendencias.
 
 Cuando el usuario hace preguntas ambiguas como "¿cómo estoy este mes?", primero clarificá:

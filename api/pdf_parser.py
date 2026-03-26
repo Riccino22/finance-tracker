@@ -1,5 +1,5 @@
 """
-PDF parser for Itaú Uruguay bank statements.
+PDF parser for bank statements.
 Adapted from pruebas/prueba.py to work as a reusable module.
 """
 from __future__ import annotations
@@ -100,7 +100,7 @@ def _extract_saldo_promedio(lineas: list[str]) -> Optional[float]:
 
 def parse_statement(pdf_bytes: bytes) -> dict:
     """
-    Parse an Itaú Uruguay bank statement PDF.
+    Parse a bank statement PDF.
 
     Returns a dict with:
       - cuenta: str
@@ -227,7 +227,7 @@ def parse_statement(pdf_bytes: bytes) -> dict:
     saldo_cierre = movimientos[-1]["saldo"] if movimientos else None
 
     return {
-        "cuenta":           cuenta or "CUENTA ITAÚ",
+        "cuenta":           cuenta or "CUENTA BANCO",
         "fecha_estado":     fecha_estado or "",
         "year":             year,
         "month":            month,
