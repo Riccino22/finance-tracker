@@ -131,9 +131,18 @@ El directorio `mcp/` contiene un servidor [MCP](https://modelcontextprotocol.io/
 
 > **Nota:** Este paso es completamente opcional. El dashboard funciona de forma independiente sin el servidor MCP.
 
-### Modo alternativo: SSE (para Docker)
+### Levantar el servidor MCP manualmente (modo SSE)
 
-Si preferís correr el servidor MCP como un contenedor, usá `MCP_TRANSPORT=sse` y conéctalo con:
+Si preferís no depender de Claude Desktop para lanzar el proceso, podés correr el servidor manualmente:
+
+```bash
+cd mcp
+pip install mcp httpx
+MCP_TRANSPORT=sse API_URL=http://localhost:8000 python server.py
+```
+
+El servidor quedará escuchando en `http://localhost:8002/sse`. Luego configurá Claude Desktop con:
+
 ```json
 {
   "mcpServers": {
@@ -144,3 +153,5 @@ Si preferís correr el servidor MCP como un contenedor, usá `MCP_TRANSPORT=sse`
   }
 }
 ```
+
+> **Importante:** con este modo el servidor debe estar corriendo antes de abrir Claude Desktop, y hay que levantarlo manualmente cada vez. Por eso se recomienda el modo stdio para uso local.
