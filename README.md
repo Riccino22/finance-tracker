@@ -101,22 +101,25 @@ dashboard_banco/
 
 El directorio `mcp/` contiene un servidor [MCP](https://modelcontextprotocol.io/) que permite hacer preguntas conversacionales sobre tus movimientos bancarios directamente desde **Claude Desktop**.
 
-### Cómo habilitarlo
+### Cómo habilitarlo (modo stdio — recomendado para uso local)
 
-1. Agrega el servicio `mcp` en `docker-compose.yml` (si no está ya incluido) o ejecútalo localmente:
+1. Instala las dependencias del servidor:
    ```bash
    cd mcp
    pip install mcp httpx
-   MCP_TRANSPORT=sse API_URL=http://localhost:8000 python server.py
    ```
 
-2. Configura Claude Desktop agregando esto en `~/.config/claude/claude_desktop_config.json`:
+2. Configura Claude Desktop en `~/.config/claude/claude_desktop_config.json`:
    ```json
    {
      "mcpServers": {
        "banco-dashboard": {
-         "transport": "sse",
-         "url": "http://localhost:8002/sse"
+         "command": "python",
+         "args": ["C:/ruta/al/proyecto/mcp/server.py"],
+         "env": {
+           "MCP_TRANSPORT": "stdio",
+           "API_URL": "http://localhost:8000"
+         }
        }
      }
    }
@@ -127,3 +130,17 @@ El directorio `mcp/` contiene un servidor [MCP](https://modelcontextprotocol.io/
    - *"¿Cuál fue mi saldo promedio en el último trimestre?"*
 
 > **Nota:** Este paso es completamente opcional. El dashboard funciona de forma independiente sin el servidor MCP.
+
+### Modo alternativo: SSE (para Docker)
+
+Si preferís correr el servidor MCP como un contenedor, usá `MCP_TRANSPORT=sse` y conéctalo con:
+```json
+{
+  "mcpServers": {
+    "banco-dashboard": {
+      "transport": "sse",
+      "url": "http://localhost:8002/sse"
+    }
+  }
+}
+```
