@@ -95,6 +95,12 @@ dashboard_banco/
 └── .env.example
 ```
 
+Para cargar datos de prueba:
+
+```bash
+docker exec -i banking_db psql -U banking_user -d banking < db/seed.sql
+```
+
 ---
 
 ## (Opcional) Servidor MCP para Claude Desktop
