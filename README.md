@@ -35,7 +35,7 @@ Dashboard web para visualizar y analizar movimientos bancarios a partir de extra
 
 1. Clona el repositorio:
    ```bash
-   git clone <url-del-repo>
+   git clone https://github.com/Riccino22/finance-tracker.git
    cd dashboard_banco
    ```
 
