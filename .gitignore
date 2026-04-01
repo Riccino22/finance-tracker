@@ -7,5 +7,5 @@ __pycache__/
 *.xlsx
 *.env
 *.dat
-*.txt
+/*.txt
 .claude
