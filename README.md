@@ -36,7 +36,7 @@ Dashboard web para visualizar y analizar movimientos bancarios a partir de extra
 1. Clona el repositorio:
    ```bash
    git clone https://github.com/Riccino22/finance-tracker.git
-   cd dashboard_banco
+   cd finance-tracker
    ```
 
 2. Copia el archivo de variables de entorno:
@@ -68,7 +68,7 @@ El archivo `.env.example` contiene los valores por defecto:
 ## Estructura del proyecto
 
 ```
-dashboard_banco/
+finance-tracker/
 ├── api/                  # Backend FastAPI
 │   ├── main.py           # Punto de entrada, migraciones
 │   ├── models.py         # Modelos SQLAlchemy
